@@ -1,0 +1,79 @@
+Introduction: 
+	This project was intended to support variable-length integers, which isn't inbuilt in C. How is this useful? In our regular programs, we normally don't see a problem in using the int data type itself. Sometimes, when numbers get pretty big, long long is usually the way to go. But even then, for some applications, long long wouldn't help.
+For example, consider the factorial program. If we use int data type, it works well for small inputs. But it fails miserably for slightly bigger inputs, like 100. Even long long wouldn't help since upper limit of long long is 9223372036854775807, and 100! is of the order of 10^157. Using variable length integers would help accommodate such huge numbers, and this program does exactly that. 
+	Storing big integers in limited space gives us a lot of power to work with huge numbers. For example, this program could calculate 2^(1000) and give the answer. I have implemented other useful functions as well such as binomial coefficient, sort, multiply, fibonacci etc.
+
+Approach:
+	In this section, I will explain in brief how each function works with the 'intal' datatype. First of all, the intal datatype is stored as null-terminated string of ASCII characters in the heap. This would mean that each digit would be stored as a character. For example, 12 would be stored as |'1'|'2'|'\0'|.
+
+(Helper function) strip: This function first finds out the number of leading zeros in the string, and then strips them off the number to return an intal without any leading zeros.
+
+intal_add:
+	This function takes in two intal arguments. Now we can't directly convert to them to ints because that defeats the purpose. So this function adds each digit individually, and there is a carry variable that stores the carry value for the addition of the next two digits. The digits in their ASCII form can be converted to ints by subtracting '0' from them. To convert ints to characters, add '0'. The algorithm implemented is the basic addition algorithm we all learnt in school. The bigger number is placed above the smaller number, and starting from the right each pair of digits are added and stored in the result pointer.
+
+intal_compare:
+	This function takes in two intals, and returns 1 if intal1 is greater than intal2, 0 if they are the same and -1 if intal1 is lesser than intal2. By using strlen, we can directly deduce which one of them is bigger and return the result. However, is both their lengths are same, we run through the strings comparing each digit from left to right. If at any point the digits don't match, they are compared and the appropriate value is returned. If all the digits match, we will reach the end of the loop and that would mean the intals are equal, and thus it returns 0.
+
+intal_diff:
+	This function takes in two intals, and returns the difference between them. Hence it is necessary to determine which of the two intals is greater, so we can subtract the smaller one from it. Because subtraction involves borrowing from previous digits, I have copied the two intals to two temporary intal variables called intal1, intal2. This is done so that the original intals aren't modified. First the function checks the trivial case when the two numbers are equal, in which case it will return 0. The subtraction algorithm subtracts each digit in intal2 from corresponding digit in intal1 (if intal1 > intal2, otherwise it's just the reverse). If it results in a negative number, borrow operation is performed. The temporary variables intal1, intal2 are freed and the final result is returned.
+
+(Helper function)convertToIntal:
+	This function takes in an integer and returns an intal containing the same integer. 
+
+(Helper function)swap:
+	This function swaps two characters, given their pointers. 
+
+(Helper function)strrev:
+	This function takes in a string and returns the string in reverse.
+
+intal_multiply:
+	The algorithm used is the brute force multiplication algorithm which has quadratic time complexity. The function first determines the larger of the two intals and names the larger one intal1 and the smaller one intal2. The larger number is multiplied digit-wise with the smaller number, and after doing so with a digit of intal2, the next result is stored with an extra shift. The function reverses the string because it is easier to work forwards than backwards in an array. The final result is returned as intal.
+
+intal_mod:
+	The function first compares the two intals given. If the first intal is lesser than the second one, the first intal itself is the answer. If intal1 is greater, intal2 is appended with zeros such that its order is close to that of int1's. After that, int2 is subtracted from int1 until int1 becomes lesser than int2. Now this whole process repeated until int2 doesn't have to be appended with zeros, and int1 is subtracted with int2 until it becomes lesser than int2, which is then the answer that has to be returned.
+
+intal_pow:
+	The intal_pow function first checks if intal1 is zero, in which case the answer would be zero itself. Then it checks if n is zero, which is another base case where the answer would be one. If none of these are true, the function then calls itself recursively to find the value when n is halved. The value returned is squared and multiplied with intal1 if n is odd and then returned. This algorithm takes O(log n) time.
+
+intal_fibonacci:
+	The zeroth and the first Fibonacci numbers are stored in prev and curr variables respectively. Then the for loop runs from i = 2 to n updating curr and prev variables using intal_add and intal_diff functions. This algorithm takes linear time to run and O(1) space complexity.
+
+intal_gcd:
+	The gcd function makes use of the intal_mod function defined earlier to implement Euclidean algorithm to calculate the gcd of the given two intals.
+
+intal_factorial:
+	This function makes use of a temporary variable called temp to store the previous number. The function runs in linear time multiplying the result variable with the temp variable and updating temp by adding one. This algorithm also takes O(1) space complexity and linear time.
+
+(Helper function)min:
+	This function simply finds the minimum of the two numbers passed to the function.
+
+intal_bincoeff:
+	We use a sliding window of one row from dynamic programming to solve this problem. The first row is initialised with zeros, but the first element is initialised with one. From then on, in n iterations, elements of the array are updated using the values already stored in the array. Since the recurrence refers to the current and previous values, we start updating from the rightmost part of the array.
+
+intal_max:
+	This function runs through the array of intals to find the index of the maximum element in the array.
+
+intal_min:
+	The function runs through the array to find the index of the minimum element in the array.
+
+intal_search:
+	This performs sequential search on the array, comparing each number with the given key and returns the offset of the first occurrence of the key, -1 if not found.
+
+intal_binsearch:
+	This performs binary search on an array which is presumed to be sorted. This function runs in O(log n) time by eliminating half the elements under consideration in each iteration. It also returns the offset of the first occurrence of the given key, -1 if not found.
+
+(Helper function)heapify:
+	Starting with i, it is compared with its children to check for validity of the heap. If one of the children is bigger than the element at i, they're swapped and heapify is called again on the child's location to ensure the validity of the max heap.
+
+intal_sort:
+	This function first constructs the heap using the heapify function. This takes linear time. After this, in each iteration, the first element of the heap is swapped with the last element and heapify is called on the first element to put it in the appropriate place. The overall time complexity of this algorithm is O(n*(log n))
+
+coin_row_problem:
+	The function used a sliding window of two elements, with one temporary variable. At first, the zeroth and the first value are initialised to zero and the first element in the array respectively. The function then runs from the second element to the last element, finding optimised value for each place until n. The optimised value at n is the answer to the coin row problem, and is therefore returned by the function.
+
+Future work:
+	This project is very basic in the sense that a lot has been assumed about the nature of intals. We have a lot of restrictions in place for a number to be considered as an intal. This project can be improved by accommodating negative numbers as well, and adding more functions like division, square root, logarithm etc. Many of these functions can be implemented quite easily because we have defined basic mathematical operations already, and these higher order functions make use of the basic functions implemented in the project.
+Many of the existing functions can also be optimised to perform faster: for example, the multiplication function implemented has quadratic time complexity. This can be improved by using other algorithms such as karatsuba etc.  
+
+	
+  
